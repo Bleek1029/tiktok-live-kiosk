@@ -7,6 +7,8 @@
   let seenOrders = new Set();
   let firstRender = true;
   let lastLabelId = null;
+  let filterSearch = '';
+  let filterNotCheckedOut = false;
 
   async function api(url, method = 'GET', body) {
     const res = await fetch(url, {
@@ -80,7 +82,14 @@
 
   function renderBoard(s) {
     const cols = { mine: [], confirmed: [], checked_out: [] };
-    if (s) s.orders.forEach((o) => { if (cols[o.status]) cols[o.status].push(o); });
+    if (s) s.orders.forEach((o) => {
+      if (!cols[o.status]) return;
+      // search filter
+      if (filterSearch && !o.user.toLowerCase().includes(filterSearch.toLowerCase())) return;
+      // not checked out filter: only show mine + confirmed
+      if (filterNotCheckedOut && o.status === 'checked_out') return;
+      cols[o.status].push(o);
+    });
     for (const [status, list] of Object.entries(cols)) {
       $('n-' + status).textContent = list.length;
       const box = $('col-' + status);
@@ -123,6 +132,42 @@
     items.sort((a, b) => a[0] - b[0]).forEach(([pin, it]) => {
       ul.append(el('li', {}, el('span', {}, `#${pin} ${it.name} · ${peso(it.price)}`),
         el('button', { onclick: () => api('/api/items/' + pin, 'DELETE') }, 'Remove')));
+    });
+  }
+
+  // ---------- follow-up panel ----------
+  async function renderFollowup() {
+    const list = await api('/api/followup');
+    const container = $('followupList');
+    container.replaceChildren();
+    if (!list.length) {
+      container.append(el('p', { class: 'empty' }, 'No outstanding orders. Everyone is caught up.'));
+      return;
+    }
+    list.forEach((b) => {
+      container.append(el('div', { class: 'followup-buyer' },
+        el('div', { class: 'followup-head' },
+          el('b', {}, '@' + b.user),
+          b.noCheckout ? el('span', { class: 'badge red-flag' }, 'NO CHECKOUT') : '',
+          el('span', { class: 'followup-total' }, peso(b.total))
+        ),
+        el('div', { class: 'followup-items' }, b.items.map((it) => el('div', { class: 'followup-item' }, '• ' + it))),
+        el('button', {
+          class: 'btn sm primary',
+          onclick: (ev) => { copyFollowup(b, ev); }
+        }, 'Copy reminder')
+      ));
+    });
+  }
+
+  function copyFollowup(b, ev) {
+    const items = b.items.map((it) => it.replace(/^•\s*/, '')).join(', ');
+    const msg = `Hi po @${b.user}, nag-mine ka ng ${items}. Paki-checkout na po. Salamat!`;
+    navigator.clipboard.writeText(msg).then(() => {
+      const btn = ev.currentTarget;
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = orig, 1200);
     });
   }
 
@@ -207,6 +252,15 @@
       el('small', {}, new Date(h.startedAt).toLocaleString('en-PH') + (h.endedAt ? '' : ' · running')),
       el('small', {}, `${h.totals.orders} orders · ${h.totals.buyers} buyers`))));
     $('historyDlg').showModal();
+  };
+
+  // filter event listeners
+  $('buyerSearch').oninput = (e) => { filterSearch = e.target.value; render(); };
+  $('filterNotCheckedOut').onchange = (e) => { filterNotCheckedOut = e.target.checked; render(); };
+
+  $('followupBtn').onclick = async () => {
+    await renderFollowup();
+    $('followupDlg').showModal();
   };
 
   fetch('/api/me').then((r) => r.json()).then((m) => { $('logoutBtn').hidden = !m.auth; });

@@ -97,6 +97,19 @@ input { border: 1px solid var(--line); background: var(--card); border-radius: 8
 .badge.JOY { background: #ffe0e8; color: #a3153b; }
 .qty { font-weight: 600; }
 
+/* board filters */
+.board-filters { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; padding: 8px 12px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); }
+.board-filters input { flex: 1; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); }
+
+/* follow-up panel */
+.followup-buyer { border: 1px solid var(--line); border-radius: 8px; padding: 10px; margin-bottom: 8px; background: var(--card); }
+.followup-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.followup-head b { font-size: 15px; }
+.followup-total { font-size: 13px; color: var(--ink-soft); font-weight: 600; }
+.followup-items { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; font-size: 13px; }
+.followup-item { color: var(--ink-soft); }
+.badge.red-flag { background: var(--live); color: #fff; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; padding: 2px 8px; border-radius: 4px; }
+
 /* side */
 .side { display: flex; flex-direction: column; gap: 14px; min-height: 0; overflow-y: auto; }
 .items-form { display: grid; grid-template-columns: 60px 1fr 72px auto; gap: 6px; }

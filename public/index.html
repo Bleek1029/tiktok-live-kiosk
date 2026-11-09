@@ -48,6 +48,12 @@
     <p class="hint">Pins that work: <code>mine 12</code>, <code>m12</code>, <code>#12 x2</code>, <code>pin 5 2pcs</code></p>
   </section>
 
+  <!-- Board filters -->
+  <div class="board-filters">
+    <input type="text" id="buyerSearch" placeholder="Search buyer…" autocomplete="off" title="Filter orders by buyer username">
+    <label class="switch"><input type="checkbox" id="filterNotCheckedOut"> <span>Not checked out only</span></label>
+  </div>
+
   <!-- Board -->
   <section class="board" aria-label="Orders board">
     <div class="col" data-status="mine"><h2>Mine <span class="count" id="n-mine">0</span></h2><div class="cards" id="col-mine"></div></div>
@@ -57,6 +63,11 @@
 
   <!-- Side -->
   <aside class="side">
+    <section class="panel">
+      <div class="panel-head"><h2>After-live follow-up</h2></div>
+      <button class="btn primary" id="followupBtn" style="width:100%;">Open follow-up panel</button>
+      <p class="hint">Lists buyers with unpaid orders and lets you copy a reminder message.</p>
+    </section>
     <section class="panel">
       <div class="panel-head"><h2>Item prices</h2></div>
       <form class="items-form" id="itemForm">
@@ -103,6 +114,12 @@
 </dialog>
 
 <div class="toast" id="toast" role="status"></div>
+
+<dialog id="followupDlg">
+  <form method="dialog" class="dlg-head"><h2>After-live follow-up</h2><button class="btn ghost">Close</button></form>
+  <div id="followupList"></div>
+</dialog>
+
 <script src="app.js"></script>
 </body>
 </html>

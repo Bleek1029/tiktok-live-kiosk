@@ -27,6 +27,22 @@ function badgeFor(user) {
   return 'OLD';
 }
 
+// Mark buyers who had orders in a past session but never checked out
+function flagNoCheckout() {
+  db.sessions.forEach((s) => {
+    if (s.endedAt) {
+      const usersWithOrders = new Set(s.orders.map((o) => o.user));
+      const usersCheckedOut = new Set(s.orders.filter((o) => o.status === 'checked_out').map((o) => o.user));
+      usersWithOrders.forEach((u) => {
+        if (!usersCheckedOut.has(u)) {
+          const b = (db.buyers[u] = db.buyers[u] || { checkedOut: 0, spent: 0 });
+          b.noCheckout = true;
+        }
+      });
+    }
+  });
+}
+
 // ---------- SSE ----------
 const clients = new Set();
 function snapshot() {
@@ -176,8 +192,33 @@ app.post('/api/session/end', (_req, res) => {
   const s = current();
   if (!s) return res.status(400).json({ error: 'No running session.' });
   s.endedAt = Date.now();
+  flagNoCheckout();
   save(); broadcast();
   res.json({ ok: true });
+});
+
+// Follow-up panel: buyers who still have Mine or Confirmed orders
+app.get('/api/followup', (_req, res) => {
+  const s = current();
+  if (!s) return res.json([]);
+  const outstanding = {};
+  s.orders
+    .filter((o) => o.status === 'mine' || o.status === 'confirmed')
+    .forEach((o) => {
+      if (!outstanding[o.user]) outstanding[o.user] = { items: [], total: 0, orders: 0 };
+      outstanding[o.user].items.push(
+        `${o.item || 'Item #' + o.pin} x${o.qty}` +
+        (o.price != null ? ' ₱' + (o.price * o.qty).toFixed(2) : '')
+      );
+      outstanding[o.user].total += (o.price || 0) * o.qty;
+      outstanding[o.user].orders += 1;
+    });
+  const list = Object.entries(outstanding).map(([user, data]) => ({
+    user,
+    ...data,
+    noCheckout: !!(db.buyers[user] && db.buyers[user].noCheckout),
+  }));
+  res.json(list);
 });
 
 app.post('/api/chat', (req, res) => {
