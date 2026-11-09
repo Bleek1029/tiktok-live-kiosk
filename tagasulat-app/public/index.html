@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tagasulat – Live selling recorder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <span class="logo" aria-hidden="true"></span>
+    <div>
+      <h1>Tagasulat</h1>
+      <p id="sessionLine">No live running</p>
+    </div>
+  </div>
+  <div class="top-actions">
+    <div class="stats" id="stats"></div>
+    <button class="btn ghost" id="historyBtn">History</button>
+    <button class="btn primary" id="startBtn">Start live</button>
+    <button class="btn danger" id="endBtn" hidden>End live</button>
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- Chat -->
+  <section class="panel chat" aria-label="Live chat">
+    <div class="panel-head">
+      <h2>Live chat</h2>
+      <label class="switch" title="Send fake buyer comments so you can test without going live">
+        <input type="checkbox" id="simToggle"> <span>Simulate buyers</span>
+      </label>
+    </div>
+    <ol class="feed" id="feed" aria-live="polite"></ol>
+    <form class="compose" id="composeForm">
+      <input id="cUser" placeholder="Username" autocomplete="off" value="juan_dc">
+      <input id="cText" placeholder="Type a comment, e.g. mine 12" autocomplete="off">
+      <button class="btn" type="submit">Send</button>
+    </form>
+    <p class="hint">Pins that work: <code>mine 12</code>, <code>m12</code>, <code>#12 x2</code>, <code>pin 5 2pcs</code></p>
+  </section>
+
+  <!-- Board -->
+  <section class="board" aria-label="Orders board">
+    <div class="col" data-status="mine"><h2>Mine <span class="count" id="n-mine">0</span></h2><div class="cards" id="col-mine"></div></div>
+    <div class="col" data-status="confirmed"><h2>Confirmed <span class="count" id="n-confirmed">0</span></h2><div class="cards" id="col-confirmed"></div></div>
+    <div class="col" data-status="checked_out"><h2>Checked out <span class="count" id="n-checked_out">0</span></h2><div class="cards" id="col-checked_out"></div></div>
+  </section>
+
+  <!-- Side -->
+  <aside class="side">
+    <section class="panel">
+      <div class="panel-head"><h2>Item prices</h2></div>
+      <form class="items-form" id="itemForm">
+        <input id="iPin" inputmode="numeric" placeholder="Pin #" aria-label="Pin number">
+        <input id="iName" placeholder="Item name" aria-label="Item name">
+        <input id="iPrice" inputmode="decimal" placeholder="₱ Price" aria-label="Price">
+        <button class="btn" type="submit">Add</button>
+      </form>
+      <ul class="plain" id="itemList"></ul>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Label preview</h2>
+        <label class="switch"><input type="checkbox" id="autoPrint" checked> <span>Print on confirm</span></label>
+      </div>
+      <div class="label-wrap"><div class="label" id="labelPreview"><p class="empty">Confirm an order to see its label.</p></div></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>Blacklist</h2></div>
+      <ul class="plain" id="banList"><li class="empty">No banned buyers.</li></ul>
+    </section>
+  </aside>
+</main>
+
+<!-- printable label (only this shows when printing) -->
+<div id="printLabel" aria-hidden="true"></div>
+
+<dialog id="historyDlg">
+  <form method="dialog" class="dlg-head"><h2>Past lives</h2><button class="btn ghost">Close</button></form>
+  <div id="historyBody"></div>
+</dialog>
+
+<dialog id="startDlg">
+  <form id="startForm" class="dlg-form">
+    <h2>Start a live session</h2>
+    <label>Session name <input id="sName" placeholder="e.g. Friday night thrift live" autocomplete="off"></label>
+    <div class="dlg-actions">
+      <button type="button" class="btn ghost" id="startCancel">Cancel</button>
+      <button class="btn primary" type="submit">Start</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+<script src="app.js"></script>
+</body>
+</html>
