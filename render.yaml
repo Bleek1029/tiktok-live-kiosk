@@ -1,0 +1,24 @@
+# Render Blueprint: creates the web service and the PostgreSQL database together.
+services:
+  - type: web
+    name: tagasulat
+    runtime: node
+    plan: free            # free web services sleep after 15 minutes idle; use "starter" for always-on
+    buildCommand: npm install --omit=optional
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tagasulat-db
+          property: connectionString   # internal URL, no SSL needed
+      - key: APP_PASSWORD
+        sync: false                    # you type this in the Render dashboard
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: NODE_VERSION
+        value: 20
+
+databases:
+  - name: tagasulat-db
+    plan: free            # free databases expire after 30 days and have no backups

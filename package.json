@@ -1,0 +1,15 @@
+{
+  "name": "tagasulat-app",
+  "version": "1.1.0",
+  "description": "Live-selling order recorder with thermal label printing (Node.js + Express + PostgreSQL)",
+  "main": "server.js",
+  "engines": { "node": ">=18" },
+  "scripts": { "start": "node server.js" },
+  "dependencies": {
+    "express": "^4.19.2",
+    "pg": "^8.11.5"
+  },
+  "optionalDependencies": {
+    "tiktok-live-connector": "^2.0.0"
+  }
+}

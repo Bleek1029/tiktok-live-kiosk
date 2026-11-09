@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log in – Tagasulat</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body { align-items: center; justify-content: center; }
+  .login { width: min(360px, 92vw); display: flex; flex-direction: column; gap: 14px; }
+  .login label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; font-size: 14px; }
+  .err { color: var(--live); font-size: 14px; min-height: 20px; }
+</style>
+</head>
+<body>
+<form class="panel login" id="f">
+  <div class="brand"><span class="logo" aria-hidden="true"></span><h1>Tagasulat</h1></div>
+  <label>Password <input type="password" id="pw" autocomplete="current-password" autofocus required></label>
+  <p class="err" id="err" role="alert"></p>
+  <button class="btn primary" type="submit">Log in</button>
+</form>
+<script>
+document.getElementById('f').onsubmit = async (e) => {
+  e.preventDefault();
+  const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: document.getElementById('pw').value }) });
+  if (r.ok) location.href = '/';
+  else document.getElementById('err').textContent = (await r.json()).error || 'Could not log in.';
+};
+</script>
+</body>
+</html>
